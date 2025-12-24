@@ -3,12 +3,20 @@ import dotenv from 'dotenv'
 import connectDB from './utils/db.js';
 import cookieParser from 'cookie-parser';
 import {userRouter} from './routes/user.routes.js'
+import cors from 'cors';
+
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 app.use(express.static("public"));
 app.use(cookieParser());
+app.use(cors({
+   origin : process.env.FRONTEND_URL,
+   credentials : true,
+   methods : ['GET','POST','PATCH','DELETE','PUT'],      
+}));
+
 
 
 const PORT = process.env.PORT;
