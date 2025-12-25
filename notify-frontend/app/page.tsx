@@ -1,10 +1,20 @@
 'use client'
 
 import React from 'react'
+import {useRouter} from 'next/router'
 import { Button } from '@/components/ui/button'
 import { Github, Linkedin, Instagram, Code2, Twitter } from 'lucide-react'
 
+const socials = [
+  { icon: Linkedin, link: 'https://www.linkedin.com/in/aakash49/' },
+  { icon: Github, link: 'https://github.com/aakash-1702' },
+  { icon: Code2, link: 'https://leetcode.com/u/cpp_aakash' },
+  { icon: Instagram, link: 'https://www.instagram.com/aakash.cpp' },
+  { icon: Twitter, link: 'https://x.com/im_aakash49' },
+]
+
 const LandingPage = () => {
+  const router = useRouter()
   return (
     <>
       {/* Hero + Main Content */}
@@ -33,6 +43,7 @@ const LandingPage = () => {
             {/* CTA Buttons */}
             <div className='flex flex-col sm:flex-row gap-6 justify-center items-center pt-8'>
               <Button 
+                onClick={() => router.push('/sign-up')}
                 size='lg'
                 className='relative text-lg px-10 py-7 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold shadow-2xl overflow-hidden group transition-all duration-300 ease-out hover:scale-105 hover:shadow-emerald-500/60'
               >
@@ -41,6 +52,7 @@ const LandingPage = () => {
               </Button>
               <Button 
                 size='lg'
+                onClick={() => router.push("/login")}
                 variant='outline'
                 className='text-lg px-10 py-7 border-2 border-emerald-400/60 text-emerald-100 backdrop-blur-md bg-emerald-900/20 hover:bg-emerald-800/40 hover:border-emerald-300 hover:text-white font-bold transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/30'
               >
