@@ -12,7 +12,7 @@ app.use(express.urlencoded({extended : true}));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(cors({
-   origin : process.env.FRONTEND_URL,
+   origin: "https://notely.vercel.app",
    credentials : true,
    methods : ['GET','POST','PATCH','DELETE','PUT'],      
 }));
