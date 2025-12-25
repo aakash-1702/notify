@@ -34,7 +34,7 @@ const NotesPage = () => {
   const handleDelete = async (id: string | number) => {
     console.log("Delete note:", id);
     const res = await fetch(
-      `http://localhost:5151/api/v1/users/delete-note/${id}`,
+      `https://notely-backend-9bno.onrender.com/api/v1/users/delete-note/${id}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -60,7 +60,7 @@ const NotesPage = () => {
 
   const fetchNotes = async () => {
     setIsLoading(true);
-    const res = await fetch("http://localhost:5151/api/v1/users/get-notes", {
+    const res = await fetch("https://notely-backend-9bno.onrender.com/api/v1/users/get-notes", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

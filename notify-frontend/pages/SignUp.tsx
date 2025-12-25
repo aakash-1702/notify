@@ -36,7 +36,7 @@ const SignUp = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const res = await fetch("http://localhost:5151/api/v1/users/signUp", {
+    const res = await fetch("https://notely-backend-9bno.onrender.com/api/v1/users/signUp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

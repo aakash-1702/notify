@@ -38,7 +38,7 @@ const LogIn = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const res = await fetch("http://localhost:5151/api/v1/users/login", {
+    const res = await fetch("https://notely-backend-9bno.onrender.com/api/v1/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // 🔑 Required for cookie auth
