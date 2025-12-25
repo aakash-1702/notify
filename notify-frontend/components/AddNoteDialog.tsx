@@ -49,7 +49,7 @@ const AddNoteDialog = ({ open, onOpenChange , onNoteCreated }: AddNoteDialogProp
     return;
   }
     // Add your API call here to save the note
-    const res = await fetch("http://localhost:5151/api/v1/users/create-note", {
+    const res = await fetch("https://notely-backend-9bno.onrender.com//api/v1/users/create-note", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // 🔑 Required for cookie auth

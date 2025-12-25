@@ -69,7 +69,7 @@ const EditNoteDialog = ({
 
     try {
       const res = await fetch(
-        `http://localhost:5151/api/v1/users/update-note/${note._id}`,
+        `https://notely-backend-9bno.onrender.com/api/v1/users/update-note/${note._id}`,
         {
           method: "PATCH", // or 'PATCH' depending on your API
           headers: { "Content-Type": "application/json" },
