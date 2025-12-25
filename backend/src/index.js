@@ -12,9 +12,10 @@ app.use(express.urlencoded({extended : true}));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use(cors({
-   origin: "https://notely.vercel.app",
-   credentials : true,
-   methods : ['GET','POST','PATCH','DELETE','PUT'],      
+  origin: "https://notely-henna.vercel.app",  // 🔥 EXACT MATCH
+  credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 
