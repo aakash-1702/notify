@@ -4,103 +4,118 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
 import NOTES from "../schemas/notes.schema.js";
 
-const userSignUp = asyncHandler(async(req,res) => {
-    console.log("requrest reached the signUp endpoint");
-    const {userName , email , password} = req.body;
-    if(!req.body || !userName || !email || !password) throw new ApiError(400,"Please provide the input fields");
-    // checking if the user already exists
-    const userExists = await USERS.findOne({
-        email : email
-    },{
-        userName : 1, email : 1,
-    });
+const userSignUp = asyncHandler(async (req, res) => {
+  console.log("requrest reached the signUp endpoint");
+  const { userName, email, password } = req.body;
+  if (!req.body || !userName || !email || !password)
+    throw new ApiError(400, "Please provide the input fields");
+  // checking if the user already exists
+  const userExists = await USERS.findOne(
+    {
+      email: email,
+    },
+    {
+      userName: 1,
+      email: 1,
+    }
+  );
 
-    // if the user exists , we return saying user is already registered , please logIn again
-    if(userExists) {
-        return res.status(200).json(new ApiResponse(
-            200,userExists,"User is already registered"
-        ));
-    } 
+  // if the user exists , we return saying user is already registered , please logIn again
+  if (userExists) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, userExists, "User is already registered"));
+  }
 
+  const newUser = await USERS.create({
+    userName: userName,
+    email: email,
+    password: password,
+  });
 
-    const newUser = await USERS.create({
-        userName : userName,
-        email : email,  
-        password : password      
-    });
+  if (!newUser)
+    throw new ApiError(
+      401,
+      "Something went wrong while registering the employee"
+    );
 
+  if (newUser)
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newUser, "User created successfully"));
+});
 
-    if(!newUser) throw new ApiError(401,"Something went wrong while registering the employee");
+const userLogin = asyncHandler(async (req, res) => {
+  if (!req.body)
+    throw new ApiError(400, "Please provide the email adn password");
+  const { email, password } = req.body;
 
-    if(newUser) return res 
-                .status(201)
-                .json(new ApiResponse(201,newUser,"User created successfully"));
+  if (!email || !password)
+    throw new ApiError(400, "Please provide the email and password");
 
+  // have to check if the user exists and if the password matches or not
+  const userExists = await USERS.findOne({
+    email,
+  });
 
-})
+  if (!userExists) throw new ApiError(401, "User is not signed Up");
 
+  // seeing if the password is correct
+  const isPasswordCorrect = await userExists.isPasswordCorrect(password);
 
+  if (!isPasswordCorrect)
+    throw new ApiError(401, "Password is incorrect , please provide it again");
 
-const userLogin = asyncHandler(async(req,res) => {
-    if(!req.body) throw new ApiError(400,"Please provide the email adn password");
-    const {email , password} = req.body;
+  const accessToken = await userExists.generateAccessToken();
+  const refreshToken = await userExists.generateRefreshToken();
 
-    if(!email || !password) throw new ApiError(400,"Please provide the email and password");
-    
-    // have to check if the user exists and if the password matches or not
-    const userExists = await USERS.findOne({
-        email
-    });
+  const updatedUserwithRefreshToken = await USERS.findByIdAndUpdate(
+    {
+      _id: userExists._id,
+    },
+    {
+      refreshToken: refreshToken,
+    },
+    { new: true }
+  );
 
-    if(!userExists) throw new ApiError(401,"User is not signed Up");
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV == "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV == "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
 
-    // seeing if the password is correct
-    const isPasswordCorrect = await userExists.isPasswordCorrect(password);
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        updatedUserwithRefreshToken,
+        "User loggedin Successfully"
+      )
+    );
+});
 
-    if(!isPasswordCorrect) throw new ApiError(401,"Password is incorrect , please provide it again");
+const createNotes = async (req, res) => {
+  const { title, description, resource } = req.body;
+  if (!title) throw new ApiError(400, "Title is required to create a note");
+  const userId = req.user._id;
+  const newNote = await NOTES.create({
+    userId: userId,
+    title: title,
+    description: description,
+    resource: resource || "",
+  });
 
-    
-
-    const accessToken = await userExists.generateAccessToken();
-    const refreshToken = await userExists.generateRefreshToken();
-
-
-    const updatedUserwithRefreshToken = await USERS.findByIdAndUpdate({
-        _id : userExists._id
-    },{
-        refreshToken : refreshToken
-    },{new : true   
-    });
-
-    res.cookie("accessToken",accessToken,{
-        httpOnly : true,
-        secure : process.env.NODE_ENV == "production"
-    });
-    res.cookie("refreshToken",refreshToken,{
-        httpOnly : true,
-        secure : process.env.NODE_ENV == "production"
-    });
-
-    return res.status(200).json(new ApiResponse(200,updatedUserwithRefreshToken,"User loggedin Successfully"));
-    
-})
-
-
-
-const createNotes = async(req,res) =>{
-    const {title , description , resource } = req.body;
-    if(!title) throw new ApiError(400,"Title is required to create a note");
-    const userId = req.user._id;
-    const newNote = await NOTES.create({
-        userId : userId,
-        title : title,
-        description : description,
-        resource : resource || ""
-    });    
-    
-    return res.status(201).json(new ApiResponse(201,newNote,"Note created successfully"));
-}
-
+  return res
+    .status(201)
+    .json(new ApiResponse(201, newNote, "Note created successfully"));
+};
 
 // Controller: Update an existing note by ID
 // -------------------------------------------------------------
@@ -160,14 +175,10 @@ const updateNotes = async (req, res) => {
   // Send back success response
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, noteTobeEdited, "Note updated successfully")
-    );
+    .json(new ApiResponse(200, noteTobeEdited, "Note updated successfully"));
 };
 
-
 const getAllNotes = async (req, res) => {
-
   // `req.user` is attached by the auth middleware after verifying the JWT.
   // It contains the logged-in user's data ( _id, userName, email, etc )
   const user = req.user;
@@ -176,40 +187,44 @@ const getAllNotes = async (req, res) => {
   // where the userId field matches the current user's _id.
   // This ensures users can access ONLY their own notes.
   const allNotes = await NOTES.find({
-      userId: user._id
+    userId: user._id,
   })
-  // Sort notes so that the newest note appears first.
-  .sort({ createdAt: -1 });
+    // Sort notes so that the newest note appears first.
+    .sort({ createdAt: -1 });
 
   // Return a standardized success response
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      allNotes,
-      `All notes for the user : ${user.userName} fetched successfully`
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        allNotes,
+        `All notes for the user : ${user.userName} fetched successfully`
+      )
+    );
 };
 
+const deleteNote = async (req, res) => {
+  const { id } = req.params;
+  if (!id)
+    throw new ApiError(401, "Please provide the id for deleting the note");
 
+  const deletedNote = await NOTES.findByIdAndDelete({
+    _id: id,
+  });
 
+  if (!deletedNote)
+    throw new ApiError(401, "Unable to delete the note at the moement");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, deletedNote, "Note deleted successfully"));
+};
 
-const deleteNote = async (req,res) => {
-    const {id} = req.params;
-    if(!id) throw new ApiError(401,"Please provide the id for deleting the note");
-
-    const deletedNote = await NOTES.findByIdAndDelete({
-        _id : id
-    });
-
-    if(!deletedNote) throw new ApiError(401,"Unable to delete the note at the moement");
-    return res.status(200).json(new ApiResponse(200,deletedNote,"Note deleted successfully"));
-}
-
-
-
-
-
-
-
-export {userSignUp , userLogin , createNotes , updateNotes , getAllNotes , deleteNote };
+export {
+  userSignUp,
+  userLogin,
+  createNotes,
+  updateNotes,
+  getAllNotes,
+  deleteNote,
+};

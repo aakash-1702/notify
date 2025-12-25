@@ -1,0 +1,14 @@
+{
+  "name": "notely",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "start:server": "npm --prefix server run start",
+    "start:client": "npm --prefix client run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
