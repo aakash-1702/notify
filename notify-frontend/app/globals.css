@@ -120,6 +120,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-emerald-50/30 via-teal-50/50 to-cyan-50/30 dark:from-slate-900 dark:via-emerald-950/50 dark:to-teal-950/40;
   }
 }

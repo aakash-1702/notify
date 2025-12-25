@@ -52,7 +52,7 @@ const userLogin = asyncHandler(async(req,res) => {
         email
     });
 
-    if(!userExists) throw new ApiError(401,"Email and password are incorrect");
+    if(!userExists) throw new ApiError(401,"User is not signed Up");
 
     // seeing if the password is correct
     const isPasswordCorrect = await userExists.isPasswordCorrect(password);
@@ -118,7 +118,7 @@ const updateNotes = async (req, res) => {
   if (!id) throw new ApiError(400, "Note ID is required to update the note");
 
   // Only these fields are allowed to be updated — anything else is ignored
-  const allowedUpdates = ["title", "description", "resources", "revisionStatus"];
+  const allowedUpdates = ["title", "description", "resource", "revisionStatus"];
 
   // Object to hold only valid fields from req.body
   const updates = {};

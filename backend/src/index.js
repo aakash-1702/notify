@@ -4,7 +4,7 @@ import connectDB from './utils/db.js';
 import cookieParser from 'cookie-parser';
 import {userRouter} from './routes/user.routes.js'
 import cors from 'cors';
-
+import {errorHandler} from './middlewares/err.middlewares.js'
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -16,6 +16,8 @@ app.use(cors({
    credentials : true,
    methods : ['GET','POST','PATCH','DELETE','PUT'],      
 }));
+
+
 
 
 
@@ -37,5 +39,6 @@ await connectDB()
 
 
 app.use('/api/v1/users',userRouter);
+app.use(errorHandler); // using it to format errors into json format
 // app.use('/api/v1/admin',adminRouter);
 
