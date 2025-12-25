@@ -55,7 +55,7 @@ const NotesPage = () => {
     });
 
     setNotes((prev) => prev.filter((note) => note._id !== id));
-    
+
   };
 
   const fetchNotes = async () => {
@@ -86,7 +86,7 @@ const NotesPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/30 via-teal-50/50 to-cyan-50/30 dark:from-slate-900 dark:via-emerald-950/50 dark:to-teal-950/40">
+    <div className="pt-25 min-h-screen bg-gradient-to-br from-emerald-50/30 via-teal-50/50 to-cyan-50/30 dark:from-slate-900 dark:via-emerald-950/50 dark:to-teal-950/40">
       {/* Main Content Container - Aligned with navbar width */}
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Page Header */}

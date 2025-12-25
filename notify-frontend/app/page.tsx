@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import {useRouter} from 'next/router'
+import {useRouter} from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Github, Linkedin, Instagram, Code2, Twitter } from 'lucide-react'
 
@@ -98,15 +98,15 @@ const LandingPage = () => {
             </div>
 
             <div className='flex items-center gap-5'>
-              {[Linkedin, Github, Code2, Instagram, Twitter].map((Icon, i) => (
+              {socials.map((social, i) => (
                 <a 
                   key={i}
-                  href='#' 
+                  href={social.link} 
                   target='_blank' 
                   rel='noopener noreferrer'
                   className='w-12 h-12 rounded-full bg-emerald-900/40 hover:bg-emerald-700/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300 ease-out hover:scale-125 hover:rotate-12 hover:shadow-lg hover:shadow-emerald-500/50'
                 >
-                  <Icon className='h-6 w-6 text-emerald-300' />
+                  <social.icon className='h-6 w-6 text-emerald-300' />
                 </a>
               ))}
             </div>
