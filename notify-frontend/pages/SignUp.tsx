@@ -1,124 +1,120 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import React from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const SignUp = () => {
+
+  // Loading state prevents double form submission
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // Controlled form state
   const [formData, setFormData] = React.useState({
-    username: '',
-    email: '',
-    password: ''
-  })
+    username: "",
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = () => {
-    console.log('Form submitted:', formData)
-    
-    // Add your sign-up logic here
-  }
+  /**
+   * Handles form submission
+   * 1. Prevents page reload
+   * 2. Sends signup request to backend
+   * 3. Shows success / error toast using Sonner
+   * 4. Redirects user to login page on success
+   */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
+    const res = await fetch("http://localhost:5151/api/v1/users/signUp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userName: formData.username,
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+
+    const data = await res.json();
+
+    // ❌ Error case
+    if (!res.ok) {
+      toast.error("Signup failed", {
+        description: data.message || "Unable to create account",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // ✅ Success case
+    toast.success(data.success, {
+      description: data.message || "You can now login with your credentials",
+    });
+
+    setIsLoading(false);
+    setTimeout(() => {
+        window.location.href="/login"
+    },2000);
+  };
+
+  /**
+   * Updates form state when user types
+   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
-  }
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   return (
-    <div className='flex flex-col justify-center items-center min-h-screen p-4 pt-24 bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50 dark:from-slate-950 dark:via-emerald-950 dark:to-teal-950'>
-      <Card className='w-full max-w-md relative overflow-hidden border-2 border-emerald-200/50 dark:border-emerald-800/50 shadow-2xl'>
-        {/* Gradient overlay effect */}
-        <div className='absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500'></div>
+    <div className="flex items-center justify-center min-h-screen p-6 bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50 dark:from-slate-950 dark:via-emerald-950 dark:to-teal-950">
+      <Card className="w-full max-w-md border-2 border-emerald-200/50 dark:border-emerald-800/50 shadow-2xl">
         
-        <CardHeader className='space-y-1 pt-8'>
-          <div className='flex justify-center mb-4'>
-            <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg'>
-              <span className='text-4xl font-bold text-emerald-950'>N</span>
-            </div>
-          </div>
-          <CardTitle className='text-3xl font-bold text-center bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent'>
-            Join notely
-          </CardTitle>
-          <CardDescription className='text-center text-base'>
-            Create your account and start taking notes
-          </CardDescription>
+        <CardHeader className="space-y-2 text-center">
+          <CardTitle className="text-3xl font-bold">Join Notely</CardTitle>
+          <CardDescription>Create your account</CardDescription>
         </CardHeader>
 
-        <CardContent className='space-y-4 pb-8'>
-          <div className='space-y-4'>
-            {/* Username Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='username' className='text-sm font-medium'>
-                Username
-              </Label>
-              <Input
-                id='username'
-                name='username'
-                type='text'
-                placeholder='johndoe'
-                value={formData.username}
-                onChange={handleChange}
-                className='h-11 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
-              />
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-5">
+
+            <div className="space-y-2">
+              <Label>Username</Label>
+              <Input name="username" value={formData.username} onChange={handleChange} />
             </div>
 
-            {/* Email Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='email' className='text-sm font-medium'>
-                Email
-              </Label>
-              <Input
-                id='email'
-                name='email'
-                type='email'
-                placeholder='john@example.com'
-                value={formData.email}
-                onChange={handleChange}
-                className='h-11 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
-              />
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input name="email" value={formData.email} onChange={handleChange} />
             </div>
 
-            {/* Password Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='password' className='text-sm font-medium'>
-                Password
-              </Label>
-              <Input
-                id='password'
-                name='password'
-                type='password'
-                placeholder='••••••••'
-                value={formData.password}
-                onChange={handleChange}
-                className='h-11 border-2 focus:border-emerald-500 dark:focus:border-emerald-400 transition-colors'
-              />
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <Input type="password" name="password" value={formData.password} onChange={handleChange} />
             </div>
 
-            {/* Submit Button */}
-            <Button 
-              onClick={handleSubmit}
-              className='w-full h-11 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 mt-6'
-            >
-              Create Account
+            <Button type="submit" disabled={isLoading} className="w-full mt-4">
+              {isLoading ? "Creating..." : "Create Account"}
             </Button>
-          </div>
 
-          {/* Sign In Link */}
-          <div className='text-center text-sm text-muted-foreground pt-4'>
-            Already have an account?{' '}
-            <a href='#' className='text-emerald-600 dark:text-emerald-400 font-semibold hover:underline'>
-              Sign in
-            </a>
-          </div>
-        </CardContent>
-
-        {/* Bottom accent */}
-        <div className='absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent'></div>
+          </CardContent>
+        </form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default SignUp
+export default SignUp;
+    
